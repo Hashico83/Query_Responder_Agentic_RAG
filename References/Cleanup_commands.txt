@@ -1,0 +1,7 @@
+deactivate 2>/dev/null || true
+rm -rf venv
+pip cache purge
+rm -rf ~/Library/Caches/pip
+arch -arm64 python3 -m venv venv
+source venv/bin/activate
+python -c "import platform; print(platform.machine()); print(platform.architecture()); import sys; print(sys.version)"

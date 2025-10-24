@@ -1,0 +1,14 @@
+chromadb
+langchain
+langchain-community
+langchain-huggingface # <-- This is the key one for modern HuggingFace embeddings in LangChain
+unstructured
+python-docx
+openpyxl
+pypdf
+pillow
+python-magic
+pytesseract
+sentence-transformers # <-- This is still needed by langchain-huggingface internally
+sqlite-utils
+tqdm

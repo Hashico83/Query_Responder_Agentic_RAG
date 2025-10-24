@@ -1,0 +1,112 @@
+/* General layout and typography */
+:root {
+  --primary-color: #0076a8; /* Cognizant Blue */
+  --secondary-color: #e3e3e3;
+  --background-color: #0d1117;
+  --surface-color: #161b22;
+  --text-color-light: #f0f6fc;
+  --text-color-dark: #24292f;
+  --border-color: #30363d;
+  --border-radius: 8px;
+
+  font-family: "Poppins", sans-serif;
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--background-color);
+  color: var(--text-color-light);
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.app {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 0;
+  transition: margin-left 0.3s ease;
+  padding: 20px;
+}
+
+.app-header {
+  text-align: center;
+  padding: 30px 20px;
+  background-color: var(--surface-color);
+  border-bottom: 2px solid var(--primary-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border-radius: var(--border-radius);
+  margin-bottom: 20px;
+}
+
+.app-header h1 {
+  color: var(--primary-color);
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-shadow: 0 0 5px rgba(0, 118, 168, 0.5);
+}
+
+.app-header p {
+  color: var(--secondary-color);
+  font-size: 1.1rem;
+  font-style: italic;
+}
+
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 20px 20px;
+  gap: 20px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #005f88;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .app-header h1 {
+    font-size: 2rem;
+  }
+
+  .app-header p {
+    font-size: 1rem;
+  }
+
+  .chat-container {
+    padding: 10px;
+  }
+}

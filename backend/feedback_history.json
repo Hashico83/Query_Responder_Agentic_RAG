@@ -1,0 +1,9 @@
+[
+    {
+        "timestamp": "2025-08-12T17:43:45.550025",
+        "user_id": "dummy_user_id",
+        "query": "What is your approach to using AI for predictive maintenance and proactive issue resolution?",
+        "response": "Based on the context provided, the approach to using AI for predictive maintenance and proactive issue resolution is to shift from a reactive to a predictive model. This is done through the following steps:\n\n*   **Data Aggregation:** Collecting data from various sources such as application logs, infrastructure metrics, user feedback, and service desk tickets.\n*   **Anomaly Detection:** Using machine learning algorithms to establish a baseline for normal system behavior and flagging any deviation as an anomaly.\n*   **Predictive Modeling:** Training predictive models on historical data to identify patterns that precede system failures or performance degradation.\n*   **Automated Action:** Once an impending issue is predicted, the system automatically triggers a pre-defined workflow, which could include generating an alert, initiating a self-healing script, or recommending a manual intervention.\n\nThis approach is part of the most advanced layer, \"Level 3: Cognitive & Proactive Automation,\" which uses AI models to predict potential system failures, proactively trigger self-healing mechanisms, and recommend preventative maintenance actions.",
+        "liked": true
+    }
+]
