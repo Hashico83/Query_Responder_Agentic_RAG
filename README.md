@@ -1,263 +1,152 @@
-# Query Responder RAG App
+🧠 **Query Responder — Agentic RAG System**
 
-A full-stack application featuring a React frontend with a dark theme and turquoise accents, connected to a Flask backend that provides Bhagavad Gita wisdom through a REST API.
+A modular, production-ready framework for agent-driven document intelligence.
 
-## 🏗️ Project Structure
+🚀 **Overview**
 
-```
-query-responder-ragApp/
-├── backend/
-│   ├── app.py              # Flask API server
-│   ├── requirements.txt     # Python dependencies
-│   └── README.md          # Backend documentation
-├── frontend/
-│   ├── src/
-│   │   ├── components/     # React components
-│   │   ├── App.tsx        # Main application
-│   │   └── main.tsx       # Entry point
-│   ├── package.json       # Node.js dependencies
-│   └── README.md          # Frontend documentation
-├── ingestion-pipeline/
-│   ├── config.py           # Configuration settings
-│   ├── ingest_docs.py      # Document ingestion script
-│   ├── requirements.txt    # Python dependencies
-│   ├── chroma_db_data/    # ChromaDB storage
-│   └── README.md          # Ingestion documentation
-├── reference-docs/         # Document storage for RAG
-└── README.md              # This file
-```
+Query Responder is an Agentic Retrieval-Augmented Generation (RAG) system built end-to-end — combining a React + Vite frontend, a Flask backend, and a ChromaDB vector store with HuggingFace embeddings and local or remote LLM integration (Ollama, OpenAI, Claude, or Gemini).
 
-## 🚀 Quick Start
+This was creaeted as part of a vibe coding challenge. While the choice was to use a complete no code platform as per the coding challenge, I took the less troden path of using chat assists to develop the code while defining the functionality of the components myself. This helped me to be in better control.
 
-### Prerequisites
+Simply put, its an ecosystem of agents, utilizing a RAG mechanism to find the response of a query posted by the user. If the agents reason that the response it is not satisfactory, it enquires the user whether the information can be obtained from the internet and if yes, gathers the same using SerperDev.
 
-- **Node.js** (v16 or higher)
-- **Python** (v3.8 or higher)
-- **npm** or **yarn**
+🧩 Core Components
+Folder Description
+frontend/-- React + Vite app for the chat UI. Displays conversation history, user input, and model responses with source attributions.
 
-### Option 1: Single Command Startup (Recommended)
+backend/-- Flask API implementing the complete agentic RAG orchestration logic (LLM + retrieval + synthesis).
 
-**For macOS/Linux:**
+Endpoints:
+• POST /api/query — full RAG + agent pipeline
+• POST /api/feedback — collects user feedback
+• GET /health — service health check
+ingestion-pipeline/ Scripts to process and embed your documents into ChromaDB. Handles chunking, metadata tagging, and vector persistence.
+reference-docs/ Folder for your internal knowledge base (PDFs, DOCX, HTML, TXT, etc).
+ingestion-pipeline/chroma_db_data/ Local persisted ChromaDB vector store.
 
-```bash
-cd query-responder-ragApp
-./start-app.sh
-```
+🧠 Agentic RAG Flow — How It Works
+1️⃣ Ingest Knowledge
 
-**For Windows:**
+Place documents in reference-docs/.
 
-```bash
-cd query-responder-ragApp
-start-app.bat
-```
+Run ingestion-pipeline/ingest_docs.py.
 
-This will automatically:
+Reads supported formats (PDF, DOCX, HTML, TXT, etc.)
 
-- Create a Python virtual environment
-- Install all dependencies
-- Start both backend and frontend servers
-- Open the application in your browser
+Splits documents into overlapping chunks
 
-### Option 2: Manual Setup
+Generates embeddings via HuggingFace
 
-#### Backend Setup
+Persists embeddings + metadata in ChromaDB
 
-1. **Navigate to the backend directory:**
+2️⃣ Receive a Query
 
-   ```bash
-   cd query-responder-ragApp/backend
-   ```
+The frontend sends the user query to POST /api/query.
 
-2. **Install Python dependencies:**
+The backend logs and processes it via the agent decision flow.
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+3️⃣ Agentic Orchestration (Backend Intelligence)
 
-3. **Start the Flask server:**
+The backend implements a multi-stage reasoning agent orchestrated in app.py:
 
-   ```bash
-   python3 app.py
-   ```
+**Stage Description**
 
-4. **Verify the backend is running:**
-   - Open http://localhost:5001/health in your browser
-   - You should see: `{"status": "healthy", "service": "Query Responder RAG API"}`
+_Planner / Decision Layer_ Determines whether the query is clear, ambiguous, or requires clarification. Handles multi-turn context and permission for web search.
+_Retriever_ Performs semantic search on ChromaDB (vector similarity) to fetch top-k relevant document chunks.
+_Relevance Grader_ Uses the LLM to evaluate whether the retrieved context is sufficiently related to the question.
+_Synthesizer_ Builds a contextual prompt and calls the configured LLM (Ollama / OpenAI / Claude / Gemini) to generate a grounded answer.
 
-#### Frontend Setup
+_Verifier_ Optionally cross-checks synthesized answer with retrieved context to detect contradictions or low confidence.
+_Rephraser / Finetuner_ Refines the final response using FINETUNE_RESPONSE_PROMPT_TEMPLATE for coherence and tone consistency.
+4️⃣ Response Construction
 
-1. **Open a new terminal and navigate to the frontend directory:**
+The agent returns a structured JSON payload:
 
-   ```bash
-   cd query-responder-ragApp/frontend
-   ```
-
-2. **Install Node.js dependencies:**
-
-   ```bash
-   npm install
-   ```
-
-3. **Start the React development server:**
-
-   ```bash
-   npm run dev
-   ```
-
-4. **Open the application:**
-   - The app will be available at http://localhost:5173
-   - You'll see the dark-themed interface with turquoise accents
-
-## 🎨 Features
-
-### Frontend
-
-- **Dark Theme**: Deep background (#1a1a1a) with turquoise accents (#00bcd4)
-- **Chat Interface**: Real-time query input and response display
-- **History Sidebar**: Expandable sidebar showing previous queries
-- **Responsive Design**: Works on desktop and mobile
-- **Loading States**: Visual feedback during API calls
-
-### Backend
-
-- **Flask API**: Lightweight Python web framework
-- **CORS Support**: Enabled for frontend-backend communication
-- **Bhagavad Gita Wisdom**: Returns spiritual teachings from the Gita
-- **Error Handling**: Proper HTTP status codes and error messages
-
-## 🔧 API Endpoints
-
-### POST `/api/query`
-
-Submit a query and receive a Bhagavad Gita response.
-
-**Request:**
-
-```json
 {
-  "query": "What is karma yoga?"
+"query": "user question",
+"response": "generated answer",
+"source": "Agent + Internal Docs",
+"sources": [
+{ "filename": "policy.pdf", "score": 0.91, "snippet": "..." }
+]
 }
-```
 
-**Response:**
+The frontend displays the result with citations and conversation history.
 
-```json
-{
-  "response": "Krishna says in the Bhagavad Gita: 'You have the right to work only, but never to its fruits...'",
-  "query": "What is karma yoga?",
-  "source": "Bhagavad Gita"
-}
-```
+🧠 Supported LLM Providers
 
-### GET `/health`
+The backend dynamically loads the LLM based on configuration in config.py:
 
-Health check endpoint for monitoring.
+Provider Backend Class Example Models
+Ollama ChatOllama Mistral, Llama3, Phi3, etc.
+OpenAI ChatOpenAI gpt-4o, gpt-4o-mini
+Claude ChatAnthropic Claude-3.5-Sonnet, Claude-3.5-Haiku
+Gemini ChatGoogleGenerativeAI gemini-1.5-pro, gemini-flash
 
-## 🎯 Usage
+All providers can be toggled via config.ACTIVE_LLM_PROVIDER.
 
-1. **Start both servers** (backend on port 5001, frontend on port 5173)
-2. **Open the frontend** in your browser
-3. **Type a question** in the chat input
-4. **Click "Send"** or press Enter
-5. **View the response** from the Bhagavad Gita
-6. **Use the history sidebar** to view previous queries
+⚙️ **Tech Stack**
 
-## 📚 Document Ingestion Pipeline
+_Frontend_ - React + Vite + Tailwind
+_Backend_- Flask + LangChain
+_Vector DB_ ChromaDB
+_Embeddings_ HuggingFace (sentence-transformers)
+LLM Integration Ollama / OpenAI / Claude / Gemini
+_Search Tool (Optional)_ Google Serper API for web augmentation
+✅ What’s Implemented
 
-The application includes a comprehensive document ingestion pipeline that processes documents from the `reference-docs` folder and stores them in a ChromaDB vector database for RAG functionality.
+🔹 Full agentic decision flow (planner → retriever → synthesizer → verifier → rephraser)
 
-### Setting Up Document Ingestion
+🔹 LLM integration through LangChain abstraction (multi-provider support)
 
-1. **Navigate to the ingestion pipeline:**
+🔹 Multi-turn conversation memory via lightweight session store
 
-   ```bash
-   cd query-responder-ragApp/ingestion-pipeline
-   ```
+🔹 Confidence and relevance checks
 
-2. **Create a virtual environment:**
+🔹 Web search fallback via Serper API
 
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+🔹 Feedback loop (/api/feedback) to record user satisfaction
 
-3. **Install dependencies:**
+🔹 Frontend integration with full async query/response flow
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+🚦 **Quick Start**
+Prerequisites
 
-4. **Add documents to the reference-docs folder:**
+Python 3.8+
 
-   ```bash
-   # Place your documents in the reference-docs folder
-   cp your_documents/* ../reference-docs/
-   ```
+Node.js 16+
 
-5. **Run the ingestion pipeline:**
-   ```bash
-   python3 ingest_docs.py
-   ```
+pip and npm
 
-### Supported Document Types
+(Optional) API keys for OpenAI / Anthropic / Google / Serper
 
-- **PDF Documents** (`.pdf`)
-- **Word Documents** (`.docx`, `.doc`)
-- **Excel Spreadsheets** (`.xlsx`, `.xls`)
-- **PowerPoint Presentations** (`.pptx`, `.ppt`)
-- **Text Files** (`.txt`, `.md`)
-- **CSV Files** (`.csv`)
-- **Images** (`.png`, `.jpg`, `.jpeg`, `.tiff`, `.tif`)
-- **HTML Files** (`.html`, `.htm`)
-- **JSON Files** (`.json`)
-- **XML Files** (`.xml`)
-- **Rich Text Files** (`.rtf`)
-- **Email Files** (`.eml`)
+Run Locally
 
-### Features
+# 1. Install backend dependencies
 
-- **Incremental Processing**: Only processes new or updated documents
-- **Smart Chunking**: Splits documents into optimal chunks with configurable overlap
-- **Metadata Preservation**: Maintains source file information and timestamps
-- **Progress Tracking**: Real-time progress bars and detailed logging
-- **Error Handling**: Graceful error handling with detailed error messages
+cd backend
+pip install -r requirements.txt
 
-## 🛠️ Development
+# 2. Start the backend
 
-### Backend Development
+python app.py
 
-- The Flask app runs in debug mode for hot reloading
-- API changes will automatically restart the server
-- Check the terminal for any error messages
+# 3. Install and run frontend
 
-### Frontend Development
+cd ../frontend
+npm install
+npm run dev
 
-- Vite provides fast hot module replacement
-- Changes to React components will update immediately
-- TypeScript provides type safety
+Default ports:
 
-## 🔍 Troubleshooting
+Frontend → http://localhost:5173
 
-### Backend Issues
+Backend → http://localhost:5001
 
-- **Port 5001 in use**: Change the port in `backend/app.py`
-- **Python not found**: Use `python3` instead of `python`
-- **Dependencies missing**: Run `pip install -r requirements.txt`
-
-### Frontend Issues
-
-- **Port 5173 in use**: Vite will automatically use the next available port
-- **Dependencies missing**: Run `npm install`
-- **API connection failed**: Ensure the backend is running on port 5001
-
-### CORS Issues
-
-- The backend has CORS enabled for all origins
-- If you see CORS errors, check that the backend is running
-
-## 📝 Notes
-
-- The backend currently returns a hardcoded Bhagavad Gita mantra
-- In a production environment, this would be replaced with actual RAG processing
-- The frontend is configured to connect to `http://localhost:5001`
-- Both servers run in development mode with hot reloading enabled
+🧭 Recommended Configuration (config.py)
+ACTIVE_LLM_PROVIDER = "ollama" # or "openai", "claude", "gemini"
+OLLAMA_MODEL_NAME = "mistral"
+CHROMA_PERSIST_DIR = "./ingestion-pipeline/chroma_db_data"
+CHROMA_COLLECTION_NAME = "local_docs"
+EMBEDDING_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+SERPER_API_KEY = "your-serper-key"
